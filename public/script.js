@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const currentPath = window.location.pathname.split("/").pop() || 'index.html';
     document.querySelectorAll('nav ul li a').forEach(link => {
-        if (link.getAttribute('href') === currentPath) link.classList.add('active');
+        if (link.href.includes(window.location.href)) link.classList.add('active');
     });
 
     const textElement = document.getElementById('target-text');
