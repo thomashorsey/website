@@ -2,9 +2,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentYear = document.querySelector('#current-year');
     if (currentYear) currentYear.textContent = new Date().getFullYear();
 
-    const currentPath = window.location.pathname.split("/").pop() || 'index.html';
     document.querySelectorAll('nav ul li a').forEach(link => {
-        if (link.href.includes(window.location.href)) link.classList.add('active');
+        const normalize = (path) => path.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+
+        const linkPath = normalize(link.pathname);
+        const currentPath = normalize(window.location.pathname);
+
+        if (linkPath === currentPath) {
+            link.classList.add('active');
+        }
     });
 
     const textElement = document.getElementById('target-text');
