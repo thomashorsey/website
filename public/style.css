@@ -192,9 +192,3 @@ footer p {
     width: 100%;
     margin-bottom: 1rem;
 }
-
-@media (min-width: 1450px) {
-    .project-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
