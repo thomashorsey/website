@@ -11,9 +11,6 @@
         <link rel="icon" type="image/x-icon" href="images/favicon.ico" sizes="32x32">
         <link rel="stylesheet" href="css/style.css">
         <script src="js/script.js" defer></script>
-        <link rel="prefetch" href="/">
-        <link rel="prefetch" href="projects">
-        <link rel="prefetch" href="contact">
     </head>
     <body>
         <header>
@@ -48,5 +45,13 @@
                 <p>© <span id="current-year"></span></p>
             </div>
         </footer>
+        <script type="speculationrules">
+            {
+                "prefetch": [{
+                    "source": "list",
+                    "urls": ["/", "/work", "/projects", "/contact"]
+                }]
+            }
+        </script>
     </body>
 </html>
