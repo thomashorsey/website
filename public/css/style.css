@@ -1,3 +1,27 @@
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/source-code-pro-v31-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/source-code-pro-v31-latin-700.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Tiny5';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/tiny5-v3-latin-regular.woff2') format('woff2');
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -100,11 +124,14 @@ footer p {
     border: 1px solid black;
 }
 
-.greeting-card p {
+.greeting-card p,
+#target-text {
     padding: 1rem;
-    font-family: "Tiny5", serif;
+    font-family: "Tiny5", monospace;
+    font-weight: 400;
     font-size: 4rem;
     text-align: center;
+    color: black;
 }
 
 .canvas-wrapper {
@@ -112,14 +139,6 @@ footer p {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-#target-text {
-    font-family: "Tiny5", serif;
-    font-size: 4rem;
-    padding: 1rem;
-    text-align: center;
-    color: black; 
 }
 
 #overlayCanvas {
