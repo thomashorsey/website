@@ -1,7 +1,26 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const currentYear = document.querySelector('#current-year');
-    if (currentYear) currentYear.textContent = new Date().getFullYear();
-
+    const dropDownButton = document.querySelector('.drop-down-button');
+    const navUl = document.querySelector('nav ul');
+    
+    if (dropDownButton && navUl) {
+        dropDownButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            navUl.classList.toggle('active');
+            if (navUl.classList.contains('active')) {
+                dropDownButton.textContent = '×';
+            } else {
+                dropDownButton.textContent = '=';
+            }
+        });
+        
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 425) {
+                navUl.classList.remove('active');
+                dropDownButton.textContent = '=';
+            }
+        });
+    }
+    
     document.querySelectorAll('nav ul li a').forEach(link => {
         const normalize = (path) => path.replace(/\.html$/, '').replace(/\/$/, '') || '/';
 
@@ -12,6 +31,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             link.classList.add('active');
         }
     });
+
+    const currentYear = document.querySelector('#current-year');
+    if (currentYear) currentYear.textContent = new Date().getFullYear();
 
     const textElement = document.getElementById('target-text');
     const canvas = document.getElementById('overlayCanvas');
