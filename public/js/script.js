@@ -6,11 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         dropDownButton.addEventListener('click', (e) => {
             e.preventDefault();
             navUl.classList.toggle('active');
-            if (navUl.classList.contains('active')) {
-                dropDownButton.textContent = '×';
-            } else {
-                dropDownButton.textContent = '=';
-            }
+            dropDownButton.textContent = navUl.classList.contains('active') ? '×' : '=';
         });
         
         window.addEventListener('resize', () => {
@@ -23,10 +19,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.querySelectorAll('nav ul li a').forEach(link => {
         const normalize = (path) => path.replace(/\.html$/, '').replace(/\/$/, '') || '/';
-
         const linkPath = normalize(link.pathname);
         const currentPath = normalize(window.location.pathname);
-
         if (linkPath === currentPath) {
             link.classList.add('active');
         }
@@ -40,7 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (textElement && canvas) {
         const ctx = canvas.getContext('2d');
-
         let res = 12; 
         let grid = [];
         let cols, rows;
@@ -51,18 +44,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         function capturePixels() {
             if (animationId) cancelAnimationFrame(animationId);
 
-            const cardContainer = document.querySelector('.card-container') || textElement.parentElement;
-            const parentRect = cardContainer.getBoundingClientRect();
+            const greetingCard = document.querySelector('.greeting-card');
+            const greetingCardRect = greetingCard.getBoundingClientRect();
+            const cardStyle = window.getComputedStyle(greetingCard);
+            const borderSize = parseFloat(cardStyle.borderTopWidth);
+            canvas.width = greetingCardRect.width - (borderSize * 2);
+            canvas.height = greetingCardRect.height - (borderSize * 2);
 
             const rect = textElement.getBoundingClientRect();
             const style = window.getComputedStyle(textElement);
-
-            canvas.width = parentRect.width;
-            canvas.height = parentRect.height;
-
             const fontSize = parseFloat(style.fontSize);
             res = fontSize / 8; 
-
             cols = Math.ceil(canvas.width / res);
             rows = Math.ceil(canvas.height / res);
 
@@ -70,15 +62,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tempCtx = tempCanvas.getContext('2d');
             tempCanvas.width = canvas.width;
             tempCanvas.height = canvas.height;
-
             tempCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
             tempCtx.textAlign = style.textAlign; 
             tempCtx.textBaseline = "top"; 
             tempCtx.fillStyle = "black";
 
             const paddingLeft = parseFloat(style.paddingLeft);
-            const paddingRight = parseFloat(style.paddingRight);
-            const maxWidth = rect.width - (paddingLeft + paddingRight);
+            const maxWidth = rect.width - (paddingLeft + parseFloat(style.paddingRight));
 
             const words = textElement.innerText.split(/\s+/);
             let lines = [];
@@ -94,11 +84,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             lines.push(currentLine);
 
-            const rawLineHeight = parseFloat(style.lineHeight) || fontSize * 1.1;
-            const snappedLineHeight = Math.round(rawLineHeight / res) * res;
+            const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.1;
+            const snappedLineHeight = Math.round(lineHeight / res) * res;
 
-            let rawStartX = (style.textAlign === 'center') ? (rect.left - parentRect.left + rect.width / 2) : (rect.left - parentRect.left + paddingLeft);
-            let rawStartY = (rect.top - parentRect.top); 
+            const canvasWrapper = document.querySelector('.canvas-wrapper');
+            const wrapperRect = canvasWrapper.getBoundingClientRect();
+            const rawStartX = (style.textAlign === 'center') ? (wrapperRect.left - greetingCardRect.left + wrapperRect.width / 2) : (wrapperRect.left - greetingCardRect.left + paddingLeft);
+            const rawStartY = wrapperRect.top - greetingCardRect.top;
 
             lines.forEach((line, i) => {
                 tempCtx.fillText(line, rawStartX, rawStartY + (i * snappedLineHeight));
@@ -109,9 +101,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             for (let i = 0; i < initialData.length; i += 4) {
                 if (initialData[i + 3] > 128) {
-                    const pIdx = i / 4;
-                    const x = pIdx % canvas.width;
-                    const y = Math.floor(pIdx / canvas.width);
+                    const pixelIndex = i / 4;
+                    const x = pixelIndex % canvas.width;
+                    const y = Math.floor(pixelIndex / canvas.width);
                     if (firstX === -1 || x < firstX) firstX = x;
                     if (firstY === -1 || y < firstY) firstY = y;
                 }
@@ -134,10 +126,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             for (let i = 0; i < imgData.length; i += 4) {
                 if (imgData[i + 3] > 140) {
                     const pixelIndex = i / 4;
-                    const sx = pixelIndex % canvas.width;
-                    const sy = Math.floor(pixelIndex / canvas.width);
-                    const gx = Math.floor(sx / res);
-                    const gy = Math.floor(sy / res);
+                    const x = pixelIndex % canvas.width;
+                    const y = Math.floor(pixelIndex / canvas.width);
+                    const gx = Math.floor(x / res);
+                    const gy = Math.floor(y / res);
                     if (gx >= 0 && gx < cols && gy >= 0 && gy < rows) {
                         hits[gx][gy]++;
                     }
@@ -155,13 +147,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            textElement.style.visibility = 'visible';
-            textElement.style.opacity = '0.3'; 
-
+            textElement.style.visibility = 'hidden';
             draw();
 
-            lastTime = performance.now();
-            requestAnimationFrame(gameLoop);
+            setTimeout(() => {
+                lastTime = performance.now();
+                requestAnimationFrame(gameLoop);
+            }, 2000);
         }
 
         function countNeighbors(x, y) {
@@ -178,19 +170,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         function update() {
-            let next = new Array(cols).fill(0).map(() => new Array(rows).fill(0));
+            const next = new Array(cols).fill(0).map(() => new Array(rows).fill(0));
             for (let x = 0; x < cols; x++) {
                 for (let y = 0; y < rows; y++) {
-                    let state = grid[x][y];
-                    let neighbors = countNeighbors(x, y);
-
-                    if (state === 0 && neighbors === 3) {
-                        next[x][y] = 1;
-                    } else if (state === 1 && (neighbors < 2 || neighbors > 3)) {
-                        next[x][y] = 0;
-                    } else {
-                        next[x][y] = state;
-                    }
+                    const state = grid[x][y];
+                    const neighbors = countNeighbors(x, y);
+                    next[x][y] = (state === 0 && neighbors === 3) || (state === 1 && (neighbors === 2 || neighbors === 3)) ? 1 : 0;
                 }
             }
             grid = next;
@@ -216,7 +201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (textElement.style.visibility !== 'hidden') {
                     textElement.style.visibility = 'hidden';
                 }
-
                 update();
                 draw();
                 lastTime = timestamp;
@@ -225,8 +209,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         capturePixels();
-
         window.addEventListener('resize', () => {
+            textElement.style.visibility = 'visible';
             capturePixels();
         });
     }
